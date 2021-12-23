@@ -11,8 +11,8 @@ This repository is for an application I'm developing where you will have the opt
 
 ## TODO
 - Repo-related tasks
-  - [ ] Issue tags
-  - [ ] Issue templates
+  - [x] Issue labels
+  - [x] Issue templates
   - [ ] Releases page
 - App-related tasks   
   - [ ] Releases page with `.apk`s built with Buildozer
