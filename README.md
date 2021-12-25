@@ -21,3 +21,5 @@ This repository is for an application I'm developing where you will have the opt
   - [ ] Export button
   - [ ] Previews of theme
   - [ ] Clickable color buttons that show color picker
+  - [ ] Code cleanup & transfer to kvlang
+  - [ ] Import existing themes to edit
