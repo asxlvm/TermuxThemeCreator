@@ -47,7 +47,7 @@ requirements = python3,kivy==2.0.0,https://github.com/kivymd/KivyMd/archive/mast
 #garden_requirements =
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = %(source.dir)s/assets/presplash.png
 
 # (str) Icon of the application
 icon.filename = %(source.dir)s/assets/logo.png
@@ -83,7 +83,7 @@ fullscreen = 0
 # red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,
 # darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,
 # olive, purple, silver, teal.
-android.presplash_color = darkgray
+android.presplash_color = #0d0f18
 
 # (list) Permissions
 #android.permissions = INTERNET
