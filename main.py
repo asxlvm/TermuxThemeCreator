@@ -1,6 +1,9 @@
+from typing import Text
+from kivy.uix.floatlayout import FloatLayout
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.floatlayout import MDFloatLayout
 from kivy.uix.colorpicker import ColorPicker
 from kivymd.uix.button import MDRectangleFlatButton
 from kivymd.uix.label import MDLabel
@@ -11,6 +14,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from PIL import ImageColor
 from dataclasses import dataclass
+import re
 
 COLOR_DEFAULTS = {
     "Foreground": "#c0caf5",
@@ -42,6 +46,13 @@ class ColorButton:
     colorpicker_obj: ColorPicker
     current_color: str
 
+@dataclass
+class ColorMatch:
+    name: str
+    value: str
+    full: str
+    id: str
+
 def convert_colors(hex_string):
     rgb = ImageColor.getcolor(hex_string, "RGB")
     final = []
@@ -52,8 +63,44 @@ def convert_colors(hex_string):
 class MainApp(MDApp):
     def colorchange(self, instance, *args):
         color = self.buttons[instance.id].colorpicker_obj.hex_color
-        self.buttons[instance.id].current_color = color
+        self.buttons[instance.id].current_color = color[:-2]
         self.buttons[instance.id].button_obj.background_color = convert_colors(color)
+    
+    def _filter_id(self, full):
+        filtered = re.sub("\D", "", full)
+        if filtered == "":
+            return full.title()
+        else:
+            return filtered
+    
+    def _after_import(self, *args):
+        pattern = ".*=#.+"
+        text = self._import_input.text
+        matches = re.findall(pattern, text)
+        if matches is None:
+            return
+
+        for match in matches:
+            clr = ColorMatch(full = match, name = match.split("=")[0], value = match.split("=")[1], id = self._filter_id(match.split("=")[0]))
+            self.buttons[clr.id].current_color = clr.value
+            self.buttons[clr.id].button_obj.background_color = convert_colors(clr.value)
+            self.buttons[clr.id].colorpicker_obj.set_color(
+                convert_colors(
+                    self.buttons[clr.id].current_color
+            ))
+        
+        self.import_popup.dismiss()
+
+    def _import(self, *args):
+        popup_content = MDGridLayout(cols=1, rows=2)
+        self._import_input = TextInput()
+        popup_content.add_widget(self._import_input)
+        dismiss_button = Button(text="Import", size_hint=(1,.1))
+        dismiss_button.bind(on_press=self._after_import)
+        popup_content.add_widget(dismiss_button)
+
+        self.import_popup = Popup(title="Import Theme", content = popup_content, size_hint = (.9,.9), auto_dismiss = False)
+        self.import_popup.open()
 
     def export(self, *args):
         clr_list = [self.buttons[btn].current_color for btn in self.buttons]
@@ -79,15 +126,14 @@ color7={clr_list[17]}
 color15={clr_list[18]}"""
 
         popup_content = TextInput(text=export_str)
-        self.export_popup = Popup(title="Export Output", content = popup_content, size_hint = (.9, .9))
-        self.export_popup.open()
+        export_popup = Popup(title="Export Output", content = popup_content, size_hint = (.9, .9))
+        export_popup.open()
 
     def close_btn(self, *args):
         if self.opened:
             self.opened = False
             self.btn_window.remove_widget(self.buttons[self.active_colpicker].colorpicker_obj)
-            self.toolbar.right_action_items = [["download", self.export, "Export your theme"]]
-
+            self.toolbar.right_action_items = self.default_action_items
 
     def remove_button(self, instance, *args):
         _id = instance.text if instance.text != "Close" else 0
@@ -95,11 +141,11 @@ color15={clr_list[18]}"""
         if self.opened:
             self.opened = False
             self.btn_window.remove_widget(self.buttons[self.active_colpicker].colorpicker_obj)
-            self.toolbar.right_action_items = [["download", self.export, "Export your theme"]]
+            self.toolbar.right_action_items = self.default_action_items
         else:
             self.opened = True
             self.active_colpicker = _id
-            self.toolbar.right_action_items = [["download", self.export, "Export your theme"], ["close-box", self.close_btn, "Close the selected colorpicker"]]
+            self.toolbar.right_action_items = self.action_items_closebtn
             self.btn_window.add_widget(self.buttons[_id].colorpicker_obj)
             self.buttons[_id].colorpicker_obj.set_color(
                 convert_colors(
@@ -110,6 +156,8 @@ color15={clr_list[18]}"""
     def build(self):
         self.opened = False
         self.active_colpicker = 0
+        self.default_action_items = [["download", self.export, "Export your theme"], ["upload", self._import, "Import an existing theme"]]
+        self.action_items_closebtn = [["download", self.export, "Export your theme"], ["upload", self._import, "Import an existing theme"], ["close-box", self.close_btn, "Close the selected colorpicker"]]
         
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "BlueGray"
@@ -153,7 +201,7 @@ color15={clr_list[18]}"""
         self.main_window.add_widget(self.btn_window)
         self.toolbar = MDToolbar()
         self.toolbar.title = "Termux Theme Creator"
-        self.toolbar.right_action_items = [["download", self.export, "Export your theme"]]
+        self.toolbar.right_action_items = self.default_action_items
         self.main_window.add_widget(self.toolbar)
         
 

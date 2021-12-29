@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.0.0, kivymd==0.104.2, sdl2_ttf == 2.0.15, pillow
+requirements = python3,kivy==2.0.0,https://github.com/kivymd/KivyMd/archive/master.zip,pygments,sdl2_ttf==2.0.15,pillow,docutils,plyer
 
 
 # (str) Custom source folders for requirements
@@ -95,7 +95,7 @@ android.api = 29
 android.minapi = 21
 
 # (str) Android NDK version to use
-android.ndk = r23b
+android.ndk = 19c
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
@@ -104,7 +104,7 @@ android.ndk_api = 21
 #android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-android.ndk_path = /home/asxlvm/androidndk/android-ndk-r23b
+#android.ndk_path = /home/asxlvm/androidndk/android-ndk-r23b
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
 #android.sdk_path = /usr/lib/android-sdk
